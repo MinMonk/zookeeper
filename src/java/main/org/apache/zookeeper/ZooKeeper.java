@@ -444,6 +444,7 @@ public class ZooKeeper {
 
         watchManager.defaultWatcher = watcher;
 
+        // 将zookeeper连接地址按照","切割，包装成连接地址
         ConnectStringParser connectStringParser = new ConnectStringParser(
                 connectString);
         HostProvider hostProvider = new StaticHostProvider(
@@ -1841,6 +1842,10 @@ public class ZooKeeper {
     private static ClientCnxnSocket getClientCnxnSocket() throws IOException {
         String clientCnxnSocketName = System
                 .getProperty(ZOOKEEPER_CLIENT_CNXN_SOCKET);
+        /**
+         * 获取环境变量 zookeeper.clientCnxnSocket
+         * 如果该环境变量值为null，zookeeper默认为NIO
+         */
         if (clientCnxnSocketName == null) {
             clientCnxnSocketName = ClientCnxnSocketNIO.class.getName();
         }

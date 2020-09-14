@@ -396,7 +396,9 @@ public class ClientCnxn {
         this.hostProvider = hostProvider;
         this.chrootPath = chrootPath;
 
+        // 连接超时时间等于new Zookeeper()中的超时时间除以配置的zookeeper连接地址数据
         connectTimeout = sessionTimeout / hostProvider.size();
+        // 读取超时时间为 配置的超时时间的2倍除以3
         readTimeout = sessionTimeout * 2 / 3;
         readOnly = canBeReadOnly;
 
@@ -1041,6 +1043,7 @@ public class ClientCnxn {
             long lastPingRwServer = Time.currentElapsedTime();
             final int MAX_SEND_PING_INTERVAL = 10000; //10 seconds
             InetSocketAddress serverAddress = null;
+            // 状态为close 或 鉴权失败则isAlive返回true
             while (state.isAlive()) {
                 try {
                     if (!clientCnxnSocket.isConnected()) {
