@@ -274,6 +274,7 @@ public class ZooKeeperMain {
     }
 
     protected void connectToZK(String newHost) throws InterruptedException, IOException {
+        // 如果状态为close或鉴权失败，均关闭zookeeper客户端
         if (zk != null && zk.getState().isAlive()) {
             zk.close();
         }
@@ -311,6 +312,7 @@ public class ZooKeeperMain {
             boolean jlinemissing = false;
             // only use jline if it's in the classpath
             try {
+                // 调用java默认的控制台
                 Class<?> consoleC = Class.forName("jline.ConsoleReader");
                 Class<?> completorC =
                     Class.forName("org.apache.zookeeper.JLineZNodeCompletor");
@@ -364,12 +366,23 @@ public class ZooKeeperMain {
         }
     }
 
+    /**
+     * 处理命令
+     * @param line  输入的命令
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws KeeperException
+     */
     public void executeLine(String line)
     throws InterruptedException, IOException, KeeperException {
       if (!line.equals("")) {
+          // 转换输入的指令行
         cl.parseCommand(line);
+        // 添加执行的命令行到历史记录中
         addToHistory(commandCount,line);
+        // 处理命令
         processCmd(cl);
+        // 执行的命令次数+1
         commandCount++;
       }
     }

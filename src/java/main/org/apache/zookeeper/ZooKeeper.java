@@ -773,6 +773,7 @@ public class ZooKeeper {
         throws KeeperException, InterruptedException
     {
         final String clientPath = path;
+        // 校验创建指令的路径参数是否合法
         PathUtils.validatePath(clientPath, createMode.isSequential());
 
         final String serverPath = prependChroot(clientPath);

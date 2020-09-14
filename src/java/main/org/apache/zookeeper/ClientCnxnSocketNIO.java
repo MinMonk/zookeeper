@@ -273,17 +273,23 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
      */
     void registerAndConnect(SocketChannel sock, InetSocketAddress addr) 
     throws IOException {
+        // 将channel注册到selector中
         sockKey = sock.register(selector, SelectionKey.OP_CONNECT);
+
+        // 开始连接服务端
         boolean immediateConnect = sock.connect(addr);
         if (immediateConnect) {
+            // 如果是立即连接成功，则。。。。。
             sendThread.primeConnection();
         }
     }
     
     @Override
     void connect(InetSocketAddress addr) throws IOException {
+        // 创建SocketChannel(NIO管道)
         SocketChannel sock = createSock();
         try {
+            // 注册Channel到selector中，并连接
            registerAndConnect(sock, addr);
         } catch (IOException e) {
             LOG.error("Unable to open socket to " + addr);

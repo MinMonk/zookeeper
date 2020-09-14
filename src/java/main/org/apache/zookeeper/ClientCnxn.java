@@ -994,6 +994,7 @@ public class ClientCnxn {
         private void startConnect(InetSocketAddress addr) throws IOException {
             // initializing it for new connection
             saslLoginFailed = false;
+            // 设置状态为"连接中"
             state = States.CONNECTING;
 
             setName(getName().replaceAll("\\(.*\\)",
@@ -1018,8 +1019,10 @@ public class ClientCnxn {
                     saslLoginFailed = true;
                 }
             }
+            // 输出日志：正在连接到addr
             logStartConnect(addr);
 
+            // 开始连接，这里的connect为接口方法，而前面有看到，zookeeper默认的连接方式为ClientCnxnSocketNIO，故这里直接看ClientCnxnSocketNIO的connect方法
             clientCnxnSocket.connect(addr);
         }
 
@@ -1064,6 +1067,7 @@ public class ClientCnxn {
                         } else {
                             serverAddress = hostProvider.next(1000);
                         }
+                        // 开始连接zk服务端
                         startConnect(serverAddress);
                         clientCnxnSocket.updateLastSendAndHeard();
                     }
