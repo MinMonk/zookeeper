@@ -421,6 +421,10 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
         notifyAll();
     }
 
+    /**
+     * <pre>设置处理器链表</pre>
+     * PrepRequestProcessor -->  SyncRequestProcessor  -->   FinalRequestProcessor
+     */
     protected void setupRequestProcessors() {
         RequestProcessor finalProcessor = new FinalRequestProcessor(this);
         RequestProcessor syncProcessor = new SyncRequestProcessor(this,
@@ -434,6 +438,9 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
         return listener;
     }
 
+    /**
+     * 创建session追踪器
+     */
     protected void createSessionTracker() {
         sessionTracker = new SessionTrackerImpl(this, zkDb.getSessionWithTimeOuts(),
                 tickTime, 1, getZooKeeperServerListener());

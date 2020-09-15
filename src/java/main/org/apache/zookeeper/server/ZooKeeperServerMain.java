@@ -74,11 +74,13 @@ public class ZooKeeperServerMain {
         throws ConfigException, IOException
     {
         try {
+            // j加载log4j配置
             ManagedUtil.registerLog4jMBeans();
         } catch (JMException e) {
             LOG.warn("Unable to register log4j JMX control", e);
         }
 
+        // 转换输入命令为服务端配置，这里是serverConfig哦，不是前面的QuorumPeerConfig
         ServerConfig config = new ServerConfig();
         if (args.length == 1) {
             config.parse(args[0]);
@@ -116,6 +118,7 @@ public class ZooKeeperServerMain {
             zkServer.setTickTime(config.tickTime);
             zkServer.setMinSessionTimeout(config.minSessionTimeout);
             zkServer.setMaxSessionTimeout(config.maxSessionTimeout);
+            // 对应默认的客户端，服务端的处理方式为NIOServerCnxnFactory，Ctrl+Alt+B，这里还支持另外三种方式，其中还支持Netty
             cnxnFactory = ServerCnxnFactory.createFactory();
             cnxnFactory.configure(config.getClientPortAddress(),
                     config.getMaxClientCnxns());
