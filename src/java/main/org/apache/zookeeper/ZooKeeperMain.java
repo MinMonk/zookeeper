@@ -45,7 +45,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The command line client to ZooKeeper.
+ *  Zookeeper客户端启动类
+ *  The command line client to ZooKeeper.
  *
  */
 @InterfaceAudience.Public

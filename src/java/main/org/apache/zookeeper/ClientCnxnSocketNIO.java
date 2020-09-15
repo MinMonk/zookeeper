@@ -65,6 +65,7 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
             throw new IOException("Socket is null!");
         }
         if (sockKey.isReadable()) {
+            // 读就绪
             int rc = sock.read(incomingBuffer);
             if (rc < 0) {
                 throw new EndOfStreamException(
@@ -76,6 +77,10 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
                 incomingBuffer.flip();
                 if (incomingBuffer == lenBuffer) {
                     recvCount++;
+                    /**
+                     * 这里做了一个校验，如果Buffer.getInt()>zookeeper默认的4096*1024这个大小，就会抛出IOException
+                     * 而这里的大小猜测应该是4M，后期补一下NIO的知识，了解这个getInt返回的大小是啥再来完善这里的注释
+                     */
                     readLength();
                 } else if (!initialized) {
                     readConnectResult();
@@ -99,7 +104,9 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
             }
         }
         if (sockKey.isWritable()) {
+            // 写就绪
             synchronized(outgoingQueue) {
+                // 从outgoingQueue中取去队首的Packet
                 Packet p = findSendablePacket(outgoingQueue,
                         cnxn.sendThread.clientTunneledAuthenticationInProgress());
 
@@ -114,13 +121,16 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
                         }
                         p.createBB();
                     }
+                    // 将buffer写入到socket中，也就是开始数据传输
                     sock.write(p.bb);
                     if (!p.bb.hasRemaining()) {
+                        // 如果当前packet读取完毕（也就是发送完毕），就将该packer从outgoingQueue中移除
                         sentCount++;
                         outgoingQueue.removeFirstOccurrence(p);
                         if (p.requestHeader != null
                                 && p.requestHeader.getType() != OpCode.ping
                                 && p.requestHeader.getType() != OpCode.auth) {
+                            // 如果请求类型不是ping或auth，就将该packet加入到暂挂队列中等待服务器的响应
                             synchronized (pendingQueue) {
                                 pendingQueue.add(p);
                             }
@@ -369,6 +379,7 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
                     sendThread.primeConnection();
                 }
             } else if ((k.readyOps() & (SelectionKey.OP_READ | SelectionKey.OP_WRITE)) != 0) {
+                // 当管道允许读or写的时候，开始IO操作
                 doIO(pendingQueue, outgoingQueue, cnxn);
             }
         }

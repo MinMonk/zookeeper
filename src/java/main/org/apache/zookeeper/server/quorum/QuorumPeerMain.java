@@ -35,7 +35,7 @@ import org.apache.zookeeper.server.persistence.FileTxnSnapLog;
 import org.apache.zookeeper.server.quorum.QuorumPeerConfig.ConfigException;
 
 /**
- *
+ * Zookeeper服务端启动类
  * <h2>Configuration file</h2>
  *
  * When the main() method of this class is used to start the program, the first
@@ -96,15 +96,23 @@ public class QuorumPeerMain {
         System.exit(0);
     }
 
+    /**
+     * 将启动的参数转换为服务端的启动参数
+     * @param args
+     * @throws ConfigException
+     * @throws IOException
+     */
     protected void initializeAndRun(String[] args)
         throws ConfigException, IOException
     {
+        // 转换参数配置信息
         QuorumPeerConfig config = new QuorumPeerConfig();
         if (args.length == 1) {
             config.parse(args[0]);
         }
 
         // Start and schedule the the purge task
+        // 定时清理日志文件和快照
         DatadirCleanupManager purgeMgr = new DatadirCleanupManager(config
                 .getDataDir(), config.getDataLogDir(), config
                 .getSnapRetainCount(), config.getPurgeInterval());
